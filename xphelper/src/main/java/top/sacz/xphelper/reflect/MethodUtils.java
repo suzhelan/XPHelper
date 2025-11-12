@@ -1,7 +1,5 @@
 package top.sacz.xphelper.reflect;
 
-import android.util.Log;
-
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
@@ -118,27 +116,52 @@ public class MethodUtils extends BaseFinder<Method> {
         return build;
     }
 
-    private <T> T tryCall(Method method, Object object, Object... args) {
+    private <T> T tryInvoke(Method method, Object object, Object... args) {
         try {
-            Log.d("MethodTool", "tryCall: " + method + " obj=" + object + " args " + Arrays.toString(args));
             return (T) method.invoke(object, args);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
+    public void invokeNoReturn(Object runTimeObj, Object... args) {
+        try {
+            first().invoke(runTimeObj, args);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public <T> T invokeFirst(Object runTimeObj, Object... args) {
+        Method method = first();
+        return tryInvoke(method, runTimeObj, args);
+    }
+
+    public <T> T invokeLast(Object runTimeObj, Object... args) {
+        Method method = last();
+        return tryInvoke(method, runTimeObj, args);
+    }
+
+    public <T> T invokeFirstStatic(Object... args) {
+        Method method = first();
+        return tryInvoke(method, null, args);
+    }
+
+    @Deprecated(since = "请使用invokeFirstStatic")
     public <T> T callFirstStatic(Object... args) {
         Method method = first();
-        return tryCall(method, null, args);
+        return tryInvoke(method, null, args);
     }
 
+    @Deprecated(since = "请使用invokeFirst")
     public <T> T callFirst(Object runTimeObj, Object... args) {
         Method method = first();
-        return tryCall(method, runTimeObj, args);
+        return tryInvoke(method, runTimeObj, args);
     }
 
-    public <T> T callLast(Object object, Object... args) {
+    @Deprecated(since = "请使用invokeLast")
+    public <T> T callLast(Object runtimeObj, Object... args) {
         Method method = last();
-        return tryCall(method, object, args);
+        return tryInvoke(method, runtimeObj, args);
     }
 }

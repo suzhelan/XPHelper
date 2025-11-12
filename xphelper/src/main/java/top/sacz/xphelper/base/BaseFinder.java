@@ -135,9 +135,23 @@ public abstract class BaseFinder<T extends Member> {
         return result.get(0);
     }
 
+    public T firstOrNull() {
+        if (getResult().isEmpty()) {
+            return null;
+        }
+        return result.get(0);
+    }
+
     public T last() {
         if (getResult().isEmpty()) {
             throw new ReflectException("can not find " + buildSign());
+        }
+        return result.get(result.size() - 1);
+    }
+
+    public T lastOrNull() {
+        if (getResult().isEmpty()) {
+            return null;
         }
         return result.get(result.size() - 1);
     }
