@@ -48,6 +48,7 @@ public class ActivityTools {
             throw new RuntimeException(e);
         }
     }
+
     public static List<View> getAllChildViews(Activity activity) {
         View view = activity.getWindow().getDecorView();
         return getAllChildViews(view);
@@ -56,8 +57,7 @@ public class ActivityTools {
 
     public static List<View> getAllChildViews(View view) {
         List<View> allChildren = new ArrayList<>();
-        if (view instanceof ViewGroup) {
-            ViewGroup vp = (ViewGroup) view;
+        if (view instanceof ViewGroup vp) {
             for (int i = 0; i < vp.getChildCount(); i++) {
                 View views = vp.getChildAt(i);
                 allChildren.add(views);
@@ -67,6 +67,7 @@ public class ActivityTools {
         }
         return allChildren;
     }
+
     public static void injectResourcesToContext(Context context, String moduleApkPath) {
         Resources res = context.getResources();
         if (Build.VERSION.SDK_INT >= 30) {
@@ -110,6 +111,9 @@ public class ActivityTools {
         return null;
     }
 
+    /**
+     * 在主线程执行任务
+     */
     public static void runOnUiThread(Runnable task) {
         if (Looper.myLooper() == Looper.getMainLooper()) {
             task.run();
@@ -117,6 +121,14 @@ public class ActivityTools {
             Handler handler = new Handler(Looper.getMainLooper());
             handler.postDelayed(task, 0L);
         }
+    }
+
+    /**
+     * 在主线程运行 带延迟
+     */
+    public static void runOnUiThreadDelay(long delayMillis, Runnable task) {
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.postDelayed(task, delayMillis);
     }
 
     @SuppressLint("NewApi")
