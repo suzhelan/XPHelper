@@ -7,6 +7,7 @@ import org.luckypray.dexkit.query.matchers.MethodMatcher;
 import org.luckypray.dexkit.result.MethodData;
 import org.luckypray.dexkit.result.MethodDataList;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -245,6 +246,7 @@ public class MethodFinder extends BaseDexQuery {
 
     /**
      * 构造dexkit method方法的匹配条件
+     *
      * @return
      */
     public MethodMatcher buildMethodMatcher() {
@@ -299,7 +301,7 @@ public class MethodFinder extends BaseDexQuery {
     /**
      * 查找方法 返回结果列表
      *
-     * @return
+     * @return 返回列表
      */
     public List<Method> find() {
         try {
@@ -316,9 +318,11 @@ public class MethodFinder extends BaseDexQuery {
                 return methods;
             }
             for (MethodData methodData : methodDataList) {
-                Method method = methodData.getMethodInstance(ClassUtils.getClassLoader());
-                method.setAccessible(true);
-                methods.add(method);
+                if (methodData.isMethod()) {
+                    Method method = methodData.getMethodInstance(ClassUtils.getClassLoader());
+                    method.setAccessible(true);
+                    methods.add(method);
+                }
             }
             //写入缓存
             DexKitCache.putMethodList(toString(), methods);
@@ -350,6 +354,64 @@ public class MethodFinder extends BaseDexQuery {
         return methods.get(0);
     }
 
+
+    /**
+     * 查找构造方法
+     *
+     * @return 构造方法列表
+     */
+    public List<Constructor<?>> findConstructor() {
+        try {
+            List<Constructor<?>> cache = DexKitCache.getConstructorList(toString());
+            if (cache != null) {
+                return cache;
+            }
+            ArrayList<Constructor<?>> constructors = new ArrayList<>();
+            MethodDataList methodDataList = DexFinder.getDexKitBridge().findMethod(buildFindMethod());
+            if (methodDataList.isEmpty()) {
+                DexKitCache.putConstructorList(toString(), constructors);
+                return constructors;
+            }
+            for (MethodData methodData : methodDataList) {
+                if (methodData.isConstructor()) {
+                    Constructor<?> method = methodData.getConstructorInstance(ClassUtils.getClassLoader());
+                    method.setAccessible(true);
+                    constructors.add(method);
+                }
+            }
+            //写入缓存
+            DexKitCache.putConstructorList(toString(), constructors);
+            return constructors;
+        } catch (NoSuchMethodException e) {
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * 获取构造方法 如果不存在则返回null
+     *
+     * @return 构造方法
+     */
+    public Constructor<?> firstConstructorOrNull() {
+        List<Constructor<?>> constructors = findConstructor();
+        if (constructors.isEmpty()) {
+            return null;
+        }
+        return constructors.get(0);
+    }
+
+    /**
+     * 获取构造方法 如果不存在则抛出异常
+     *
+     * @return 构造方法
+     */
+    public Constructor<?> firstConstructor() throws Exception {
+        List<Constructor<?>> constructors = findConstructor();
+        if (constructors.isEmpty()) {
+            throw new NoSuchMethodException("No constructor found :" + this);
+        }
+        return constructors.get(0);
+    }
 
     @NotNull
     @Override

@@ -12,6 +12,7 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.TypeReference;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.Set;
 
 import top.sacz.xphelper.reflect.ClassUtils;
+import top.sacz.xphelper.reflect.ConstructorUtils;
 import top.sacz.xphelper.reflect.FieldUtils;
 import top.sacz.xphelper.reflect.MethodUtils;
 import top.sacz.xphelper.util.ConfigUtils;
@@ -60,6 +62,55 @@ public class DexKitCacheProxy {
 
     public void clearCache() {
         configUtils.clearAll();
+    }
+
+    public void putConstructorList(String key, List<Constructor<?>> constructorList) {
+        ArrayList<String> infoList = new ArrayList<>();
+        for (Constructor<?> constructor : constructorList) {
+            infoList.add(getConstructorInfoJSON(constructor));
+        }
+        configUtils.put(key, infoList);
+    }
+
+    public List<Constructor<?>> getConstructorList(String key) {
+        if (!configUtils.containsKey(key)) {
+            return null;
+        }
+        ArrayList<Constructor<?>> result = new ArrayList<>();
+        ArrayList<String> constructorInfoList = configUtils.getObject(key, new TypeReference<>() {
+        });
+        if (constructorInfoList != null) {
+            for (String constructorInfo : constructorInfoList) {
+                result.add(findConstructorByJSONString(constructorInfo));
+            }
+        }
+        return result;
+    }
+
+    private String getConstructorInfoJSON(Constructor<?> constructor) {
+        JSONObject result = new JSONObject();
+        String declareClass = constructor.getDeclaringClass().getName();
+        Class<?>[] methodParams = constructor.getParameterTypes();
+        JSONArray params = new JSONArray();
+        for (Class<?> type : methodParams) {
+            params.add(type.getName());
+        }
+        result.put("DeclareClass", declareClass);
+        result.put("Params", params);
+        return result.toString();
+    }
+
+    private Constructor<?> findConstructorByJSONString(String constructorInfoStrJSON) {
+        JSONObject constructorInfo = JSONObject.parseObject(constructorInfoStrJSON);
+        String declareClass = constructorInfo.getString("DeclareClass");
+        JSONArray methodParams = constructorInfo.getJSONArray("Params");
+        Class<?>[] params = new Class[methodParams.size()];
+        for (int i = 0; i < params.length; i++) {
+            params[i] = ClassUtils.findClass(methodParams.getString(i));
+        }
+        return ConstructorUtils.create(declareClass)
+                .paramTypes(params)
+                .first();
     }
 
     public void putMethodList(String key, List<Method> methodList) {

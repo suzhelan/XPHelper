@@ -3,6 +3,7 @@ package top.sacz.xphelper.dexkit.cache;
 
 import android.content.Context;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
@@ -21,6 +22,14 @@ public class DexKitCache {
         return new DexKitCacheProxy().keys().contains(key);
     }
 
+    public static void putConstructorList(String key, List<Constructor<?>> constructorList) {
+        new DexKitCacheProxy().putConstructorList(key, constructorList);
+    }
+
+    public static List<Constructor<?>> getConstructorList(String key) {
+        return new DexKitCacheProxy().getConstructorList(key);
+    }
+
     public static void putMethodList(String key, List<Method> methodList) {
         new DexKitCacheProxy().putMethodList(key, methodList);
     }
@@ -28,7 +37,6 @@ public class DexKitCache {
     public static List<Method> getMethodList(String key) {
         return new DexKitCacheProxy().getMethodList(key);
     }
-
 
     public static void putFieldList(String key, List<Field> fieldList) {
         new DexKitCacheProxy().putFieldList(key, fieldList);
