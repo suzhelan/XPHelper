@@ -76,7 +76,7 @@ public class BaseActivity extends FragmentActivity {
             }
             try {
                 //start: overloaded
-                if (name.equals("androidx.lifecycle.LifecycleOwner") || name.equals("androidx.lifecycle.ViewModelStoreOwner") || name.equals("androidx.savedstate.SavedStateRegistryOwner")) {
+                if (name.equals("androidx.lifecycle.LifecycleOwner") || name.equals("androidx.lifecycle.ReportFragment") || name.equals("androidx.lifecycle.ViewModelStoreOwner") || name.equals("androidx.savedstate.SavedStateRegistryOwner")) {
                     return mHostReferencer.loadClass(name);
                 }
             } catch (ClassNotFoundException ignored) {
