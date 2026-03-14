@@ -29,8 +29,8 @@ public class ActivityProxyManager {
 
     public static boolean isModuleActivity(String className) {
         try {
-            return BaseActivity.class.isAssignableFrom(ClassUtils.getModuleClassLoader().loadClass(className));
-//            ClassUtils.getModuleClassLoader().loadClass(className);
+            return BaseActivity.class.isAssignableFrom(ClassUtils.getModuleClassLoader().loadClass(className))
+                    || BaseComposeActivity.class.isAssignableFrom(ClassUtils.getModuleClassLoader().loadClass(className));
         } catch (Exception e) {
             return false;
         }
@@ -38,7 +38,7 @@ public class ActivityProxyManager {
 
     /**
      * 用于启动未注册在AndroidManifest的Activity(也就是模块自身的activity)
-     * 模块自身的Activity需要继承本库的 {@link BaseActivity} 才能启动
+     * 模块自身的Activity需要继承本库的 {@link BaseActivity} {@link BaseComposeActivity} 才能启动
      *
      * @param hostContext 宿主的上下文
      */

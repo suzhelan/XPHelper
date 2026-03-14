@@ -44,14 +44,19 @@ public class HookSteps {
         }
     }
 
-    public void initHook(Context context) {
-        initDialogX(context);
-        new DexkitTest().hook();
-    }
-
     private void initDialogX(Context context) {
         DialogX.init(context);
         DialogX.globalTheme = DialogX.THEME.AUTO;
         DialogX.globalStyle = new MaterialYouStyle();
+    }
+
+    /**
+     * 开始测试
+     * @param context
+     */
+    public void initHook(Context context) {
+        initDialogX(context);
+//        new DexkitTest().hook();
+        new ActivityTest().hook();
     }
 }

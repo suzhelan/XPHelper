@@ -1,16 +1,26 @@
-package top.sacz.hook.activity;
+package top.sacz.hook.activity
 
-import android.os.Bundle;
+import android.os.Bundle
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.ui.Modifier
+import top.sacz.hook.ui.theme.QStoryTheme
+import top.sacz.xphelper.activity.BaseComposeActivity
 
-import androidx.annotation.Nullable;
-
-import top.sacz.hook.R;
-import top.sacz.xphelper.activity.BaseActivity;
-
-public class ModuleActivity extends BaseActivity {
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_module);
+class ModuleActivity : BaseComposeActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            QStoryTheme {
+                Scaffold { contentPadding ->
+                    Column(modifier = Modifier.padding(contentPadding)) {
+                        Text("Hello World!")
+                    }
+                }
+            }
+        }
     }
 }
