@@ -6,6 +6,11 @@ import io.fastkv.interfaces.FastCipher
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.serializer
 
 
@@ -111,10 +116,19 @@ class ConfigUtils @JvmOverloads constructor(
                 kv.putArray(key, value)
             }
 
+            is List<*> -> {
+                kv.putString(key, jsonTool.encodeToString(anyToJsonElement(value)))
+            }
+
+            is Map<*, *> -> {
+                kv.putString(key, jsonTool.encodeToString(anyToJsonElement(value)))
+            }
+
             else -> {
-                throw IllegalArgumentException(
-                    "Unsupported type ${value::class.java.name}; use putObject or putList for serializable types."
-                )
+                @Suppress("UNCHECKED_CAST")
+                val serializer = jsonTool.serializersModule
+                    .serializer(value::class.java)
+                putObject(key, value, serializer)
             }
         }
     }
@@ -268,6 +282,31 @@ class ConfigUtils @JvmOverloads constructor(
      */
     fun containsKey(key: String): Boolean {
         return kv.contains(key)
+    }
+
+    /**
+     * 将任意值递归转为 JsonElement，支持混合类型的 List 和 Map
+     */
+    private fun anyToJsonElement(value: Any?): JsonElement {
+        return when (value) {
+            null -> JsonNull
+            is String -> JsonPrimitive(value)
+            is Number -> JsonPrimitive(value)
+            is Boolean -> JsonPrimitive(value)
+            is List<*> -> JsonArray(value.map { anyToJsonElement(it) })
+            is Map<*, *> -> JsonObject(
+                value.entries.associate { (k, v) ->
+                    k.toString() to anyToJsonElement(v)
+                }
+            )
+
+            else -> {
+                @Suppress("UNCHECKED_CAST")
+                val serializer = jsonTool.serializersModule
+                    .serializer(value::class.java)
+                jsonTool.encodeToJsonElement(serializer, value)
+            }
+        }
     }
 
 

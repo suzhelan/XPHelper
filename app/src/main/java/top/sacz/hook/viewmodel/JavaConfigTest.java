@@ -13,24 +13,23 @@ public class JavaConfigTest {
     public String checkWrite() {
         //string list
         List<String> strs = new ArrayList<>();
-        strs.add("1");
-        strs.add("2");
-        config.putList("strs", strs, String.class);
+        strs.add("v1");
+        strs.add("v2");
+        //simple put
+        config.put("strs",strs);
         //obj list
         List<ScenarioPayload> objs = new ArrayList<>();
-        objs.add(new ScenarioPayload("one", 1));
-        objs.add(new ScenarioPayload("two", 2));
-        config.putList("objs", objs, ScenarioPayload.class);
+        objs.add(new ScenarioPayload("wadaw", 1));
+        objs.add(new ScenarioPayload("wadwdas", 2));
+        config.put("objs", objs);
 
         //obj
-        ScenarioPayload obj = new ScenarioPayload("only", 0);
-        config.putObject("obj", obj, ScenarioPayload.class);
-
+        ScenarioPayload obj = new ScenarioPayload("onlysss", 0);
+        config.put("obj", obj);
         //全部转成结果字符串
-        String sb = "putList(List<String>=[\"1\",\"2\"])" +
-                "putList(List<ScenarioPayload>=[\"one\",\"two\"])" +
-                "putObject(ScenarioPayload=[\"only\",\"0\"])";
-        return sb;
+        return "put(List<String>=[...])" +
+                "put(List<ScenarioPayload>=[...])" +
+                "put(ScenarioPayload=[...])";
     }
 
     public String readResult() {
