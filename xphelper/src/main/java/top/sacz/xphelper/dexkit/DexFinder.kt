@@ -7,6 +7,9 @@ import top.sacz.xphelper.dexkit.bean.ClassInfo
 import top.sacz.xphelper.dexkit.bean.FieldInfo
 import top.sacz.xphelper.dexkit.bean.MethodInfo
 import top.sacz.xphelper.dexkit.cache.DexKitCache
+import java.lang.reflect.Constructor
+import java.lang.reflect.Field
+import java.lang.reflect.Method
 import java.util.Timer
 import java.util.TimerTask
 import java.util.concurrent.atomic.AtomicBoolean
@@ -77,6 +80,86 @@ object DexFinder {
         val newInfo = ClassInfo().also(classInfo)
         return newInfo.generate()
     }
+
+    //region 带缓存的DexKit查询
+
+    /**
+     * 带缓存执行DexKit方法查询
+     *
+     * 使用场景: 当你需要直接使用 DexKitBridge 进行复杂查询，同时又希望走缓存时
+     *
+     * 用法:
+     * ```
+     * val method = DexFinder.queryMethod("ChatActivity_onCreate") { bridge ->
+     *     val findMethod = FindMethod.create().matcher(
+     *         MethodMatcher.create().declaredClass("com.example.ChatActivity").name("onCreate")
+     *     )
+     *     bridge.findMethod(findMethod).map { it.getMethodInstance(classLoader) }
+     * }
+     * ```
+     *
+     * @param key 缓存键(建议使用有业务含义的字符串，如 "ChatActivity_onCreate")
+     * @param block 查询逻辑，仅在缓存未命中时执行
+     * @return 查找到的方法列表
+     */
+    @JvmStatic
+    fun queryMethod(key: String, block: (DexKitBridge) -> List<Method>): List<Method> {
+        val cached = DexKitCache.getMethodList(key)
+        if (cached != null) return cached
+        val result = block(getDexKitBridge())
+        DexKitCache.putMethodList(key, result)
+        return result
+    }
+
+    /**
+     * 带缓存执行DexKit字段查询
+     *
+     * @param key 缓存键(建议使用有业务含义的字符串)
+     * @param block 查询逻辑，仅在缓存未命中时执行
+     * @return 查找到的字段列表
+     */
+    @JvmStatic
+    fun queryField(key: String, block: (DexKitBridge) -> List<Field>): List<Field> {
+        val cached = DexKitCache.getFieldList(key)
+        if (cached != null) return cached
+        val result = block(getDexKitBridge())
+        DexKitCache.putFieldList(key, result)
+        return result
+    }
+
+    /**
+     * 带缓存执行DexKit类查询
+     *
+     * @param key 缓存键(建议使用有业务含义的字符串)
+     * @param block 查询逻辑，仅在缓存未命中时执行
+     * @return 查找到的类列表
+     */
+    @JvmStatic
+    fun queryClass(key: String, block: (DexKitBridge) -> List<Class<*>>): List<Class<*>> {
+        val cached = DexKitCache.getClassList(key)
+        if (cached != null) return cached
+        val result = block(getDexKitBridge())
+        DexKitCache.putClassList(key, result)
+        return result
+    }
+
+    /**
+     * 带缓存执行DexKit构造方法查询
+     *
+     * @param key 缓存键(建议使用有业务含义的字符串)
+     * @param block 查询逻辑，仅在缓存未命中时执行
+     * @return 查找到的构造方法列表
+     */
+    @JvmStatic
+    fun queryConstructor(key: String, block: (DexKitBridge) -> List<Constructor<*>>): List<Constructor<*>> {
+        val cached = DexKitCache.getConstructorList(key)
+        if (cached != null) return cached
+        val result = block(getDexKitBridge())
+        DexKitCache.putConstructorList(key, result)
+        return result
+    }
+
+    //endregion
 
     /**
      * 清空缓存
