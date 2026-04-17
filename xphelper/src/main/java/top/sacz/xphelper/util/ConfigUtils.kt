@@ -1,10 +1,12 @@
 package top.sacz.xphelper.util
 
 import android.content.Context
-import com.alibaba.fastjson2.JSON
-import com.alibaba.fastjson2.TypeReference
 import io.fastkv.FastKV
 import io.fastkv.interfaces.FastCipher
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.serializer
 
 
 /**
@@ -14,8 +16,21 @@ import io.fastkv.interfaces.FastCipher
  */
 class ConfigUtils @JvmOverloads constructor(
     key: String = "default",
-    password: String = globalPassword
+    password: String = globalPassword,
 ) {
+    @PublishedApi
+    internal val jsonTool = Json {
+        //忽略未知jsonKey
+        ignoreUnknownKeys = true
+        //是否将null的属性写入json 默认true
+        explicitNulls = true
+        //是否使用默认值 默认false
+        encodeDefaults = false
+        //是否格式化json
+        prettyPrint = true
+        //宽容解析模式 可以解析不规范的json格式
+        isLenient = false
+    }
 
     private var id: String = key
 
@@ -62,7 +77,7 @@ class ConfigUtils @JvmOverloads constructor(
     }
 
     /**
-     * 保存数据的方法
+     * 保存数据的方法,这种写法适用于简单存储
      * @param key
      * @param value
      */
@@ -97,7 +112,9 @@ class ConfigUtils @JvmOverloads constructor(
             }
 
             else -> {
-                kv.putString(key, JSON.toJSONString(value))
+                throw IllegalArgumentException(
+                    "Unsupported type ${value::class.java.name}; use putObject or putList for serializable types."
+                )
             }
         }
     }
@@ -134,31 +151,57 @@ class ConfigUtils @JvmOverloads constructor(
         return kv.getString(key, def) ?: ""
     }
 
+    fun putStringList(key: String, value: List<String>) {
+        kv.putString(key, jsonTool.encodeToString(value))
+    }
 
-    fun <T> getObject(key: String, clz: Class<T>): T? {
+    fun getStringList(key: String): MutableList<String> {
+        val data = kv.getString(key)
+        if (data.isNullOrEmpty()) {
+            return arrayListOf()
+        }
+        return jsonTool.decodeFromString<List<String>>(data).toMutableList()
+    }
+
+
+    fun <T> putObject(key: String, value: T, serializer: KSerializer<T>) {
+        kv.putString(key, jsonTool.encodeToString(serializer, value))
+    }
+
+    inline fun <reified T> putObject(key: String, value: T) {
+        putObject(key, value, serializer())
+    }
+
+    fun <T> getObject(key: String, serializer: KSerializer<T>): T? {
         val data = kv.getString(key)
         if (data.isNullOrEmpty()) {
             return null
         }
-        return JSON.parseObject(data, clz)
+        return jsonTool.decodeFromString(serializer, data)
     }
 
-
-    fun <T> getObject(key: String, type: TypeReference<T>): T? {
-        val data = kv.getString(key)
-        if (data.isNullOrEmpty()) {
-            return null
-        }
-        return JSON.parseObject(data, type)
+    inline fun <reified T> getObject(key: String): T? {
+        return getObject(key, serializer())
     }
 
-
-    fun <T> getList(key: String, clazz: Class<T>): MutableList<T> {
+    fun <T> getList(key: String, serializer: KSerializer<T>): MutableList<T> {
         val data = kv.getString(key)
         if (data.isNullOrEmpty()) {
             return ArrayList()
         }
-        return JSON.parseArray(data, clazz)
+        return jsonTool.decodeFromString(ListSerializer(serializer), data).toMutableList()
+    }
+
+    inline fun <reified T> getList(key: String): MutableList<T> {
+        return getList(key, serializer())
+    }
+
+    fun <T> putList(key: String, value: MutableList<T>, serializer: KSerializer<T>) {
+        kv.putString(key, jsonTool.encodeToString(ListSerializer(serializer), value))
+    }
+
+    inline fun <reified T> putList(key: String, value: MutableList<T>) {
+        putList(key, value, serializer())
     }
 
     /**

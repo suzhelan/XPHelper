@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.serialization)
     id("maven-publish")
 }
 
@@ -41,7 +42,7 @@ dependencies {
     compileOnly(libs.xposed.api)
     implementation(libs.dexkit)
     implementation(libs.fastkv)
-    implementation(libs.fastjson2)
+    implementation(libs.kotlinx.serialization.json)
 }
 
 afterEvaluate {

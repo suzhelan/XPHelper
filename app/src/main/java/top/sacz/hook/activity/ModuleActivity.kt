@@ -2,7 +2,6 @@ package top.sacz.hook.activity
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -16,9 +15,7 @@ class ModuleActivity : BaseComposeActivity() {
         setContent {
             QStoryTheme {
                 Scaffold { contentPadding ->
-                    Column(modifier = Modifier.padding(contentPadding)) {
-                        Text("Hello World!")
-                    }
+                    Text("ModuleActivity", modifier = Modifier.padding(contentPadding))
                 }
             }
         }
