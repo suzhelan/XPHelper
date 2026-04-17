@@ -116,7 +116,7 @@ class ConfigUtils @JvmOverloads constructor(
                 kv.putArray(key, value)
             }
 
-            is List<*> -> {
+            is Collection<*> -> {
                 kv.putString(key, jsonTool.encodeToString(anyToJsonElement(value)))
             }
 
