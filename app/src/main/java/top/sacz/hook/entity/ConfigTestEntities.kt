@@ -1,5 +1,6 @@
 package top.sacz.hook.entity
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 data class ConfigTestTaskResult(
@@ -27,6 +28,8 @@ enum class ConfigTestCategoryType(val displayName: String) {
 
 @Serializable
 data class ScenarioPayload(
+    @SerialName("name")
     val name: String,
+    @SerialName("count")
     val count: Int
 )

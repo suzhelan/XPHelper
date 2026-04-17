@@ -365,6 +365,20 @@ class TestViewModel : ViewModel() {
                 check(result)
                 "containsKey(\"string_list\") = true"
             })
+            emit(task(
+                name = "Java侧 序列化写,obj,list等",
+                writeLabel = "模拟Java侧序列化写入"
+            ) {
+                val javaConfigTest = JavaConfigTest()
+                javaConfigTest.checkWrite()
+            })
+            emit(task(
+                name = "Java侧 序列化读,obj,list等",
+                writeLabel = "模拟Java侧批量序列化读取"
+            ) {
+                val javaConfigTest = JavaConfigTest()
+                javaConfigTest.readResult()
+            })
 
             // ==================== 5. 生命周期操作 ====================
             startCategory(ConfigTestCategoryType.LIFECYCLE)

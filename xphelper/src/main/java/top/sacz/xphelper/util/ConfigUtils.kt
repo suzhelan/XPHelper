@@ -187,7 +187,7 @@ class ConfigUtils @JvmOverloads constructor(
     fun <T> getList(key: String, serializer: KSerializer<T>): MutableList<T> {
         val data = kv.getString(key)
         if (data.isNullOrEmpty()) {
-            return ArrayList()
+            return mutableListOf()
         }
         return jsonTool.decodeFromString(ListSerializer(serializer), data).toMutableList()
     }
@@ -202,6 +202,33 @@ class ConfigUtils @JvmOverloads constructor(
 
     inline fun <reified T> putList(key: String, value: MutableList<T>) {
         putList(key, value, serializer())
+    }
+
+    /**
+     * Java桥接方法
+     */
+    @Suppress("UNCHECKED_CAST")
+    fun <T> putObject(key: String, value: T, clazz: Class<T>) {
+        val serializer = jsonTool.serializersModule.serializer(clazz) as KSerializer<T>
+        putObject(key, value, serializer)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    fun <T> getObject(key: String, clazz: Class<T>): T? {
+        val serializer = jsonTool.serializersModule.serializer(clazz) as KSerializer<T>
+        return getObject(key, serializer)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    fun <T> putList(key: String, value: MutableList<T>, clazz: Class<T>) {
+        val serializer = jsonTool.serializersModule.serializer(clazz) as KSerializer<T>
+        putList(key, value, serializer)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    fun <T> getList(key: String, clazz: Class<T>): MutableList<T> {
+        val serializer = jsonTool.serializersModule.serializer(clazz) as KSerializer<T>
+        return getList(key, serializer)
     }
 
     /**
