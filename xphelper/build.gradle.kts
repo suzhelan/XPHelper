@@ -1,0 +1,60 @@
+plugins {
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.android)
+    id("maven-publish")
+}
+
+android {
+    namespace = "top.sacz.xphelper"
+    compileSdk = 36
+
+    defaultConfig {
+        minSdk = 27
+
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles("consumer-rules.pro")
+    }
+
+    publishing {
+        singleVariant("release")
+    }
+    buildTypes {
+        release {
+            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+    kotlin {
+        jvmToolchain(17)
+    }
+}
+
+dependencies {
+    compileOnly(libs.appcompat)
+    compileOnly(libs.xposed.api)
+    implementation(libs.dexkit)
+    implementation(libs.fastkv)
+    implementation(libs.fastjson2)
+}
+
+afterEvaluate {
+    // 官方建议使用上传方法
+    publishing {
+        publications {
+            // Creates a Maven publication called "release".
+            create<MavenPublication>("release") {
+                from(components["release"]) // 表示发布 release（jitpack 都不会使用到）
+                groupId = "com.github.suzhelan" //groupId 随便取 , 这个是依赖库的组 id
+                artifactId = "XPHelper"  //artifactId 随便取 , 依赖库的名称（jitpack 都不会使用到）
+                version = "3.1" // 当前版本依赖库版本号，这个jitpack不会使用到，只是我们开发者自己查看
+            }
+        }
+    }
+}

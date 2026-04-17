@@ -5,32 +5,35 @@ plugins {
 }
 
 android {
-    namespace 'top.sacz.hook'
-    compileSdk 36
+    namespace = "top.sacz.hook"
+    compileSdk = 36
 
     defaultConfig {
-        applicationId "top.sacz.hook"
-        minSdk 27
-        targetSdk 36
-        versionCode 1
-        versionName "1.0"
+        applicationId = "top.sacz.hook"
+        minSdk = 27
+        targetSdk = 36
+        versionCode = 1
+        versionName = "1.0"
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     aaptOptions {
-        additionalParameters '--allow-reserved-package-id', '--package-id', '0xf2'
+        additionalParameters += listOf("--allow-reserved-package-id", "--package-id", "0xf2")
     }
 
     buildTypes {
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlin {
         jvmToolchain(17)
@@ -38,16 +41,16 @@ android {
 }
 
 dependencies {
-    implementation libs.appcompat
-    implementation libs.material
-    implementation libs.core.ktx
-    compileOnly libs.xposed.api
-    var dialogXVersion = "0.0.50.beta38"
+    implementation(libs.appcompat)
+    implementation(libs.material)
+    implementation(libs.core.ktx)
+    compileOnly(libs.xposed.api)
+    val dialogXVersion = "0.0.50.beta38"
     //引入DialogX主体
     implementation("com.github.suzhelan.DialogX:DialogX:$dialogXVersion")
     //非必须 DialogX官方提供的主题样式
     implementation("com.github.suzhelan.DialogX:DialogXMaterialYou:$dialogXVersion")
-    implementation project(":xphelper")
+    implementation(project(":xphelper"))
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)

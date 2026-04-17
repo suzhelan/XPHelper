@@ -19,5 +19,5 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "XPHelper"
-include ':app'
-include ':xphelper'
+include(":app")
+include(":xphelper")
