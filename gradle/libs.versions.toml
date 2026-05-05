@@ -1,13 +1,13 @@
 [versions]
-agp = "8.13.0"
-kotlin = "2.3.20"
+agp = "9.2.0"
+kotlin = "2.3.21"
 appcompat = "1.7.1"
 material = "1.13.0"
 coreKtx = "1.18.0"
 fastkv = "3.0.1"
 kotlinxSerializationJson = "1.11.0"
 activityCompose = "1.13.0"
-composeBom = "2026.03.01"
+composeBom = "2026.04.01"
 
 [libraries]
 appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
@@ -34,6 +34,5 @@ kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 android-library = { id = "com.android.library", version.ref = "agp" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
