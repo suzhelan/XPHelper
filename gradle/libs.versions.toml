@@ -1,13 +1,13 @@
 [versions]
-agp = "9.2.0"
-kotlin = "2.3.21"
+agp = "9.2.1"
+kotlin = "2.4.0"
 appcompat = "1.7.1"
-material = "1.13.0"
-coreKtx = "1.18.0"
+material = "1.14.0"
+coreKtx = "1.19.0"
 fastkv = "3.0.1"
 kotlinxSerializationJson = "1.11.0"
 activityCompose = "1.13.0"
-composeBom = "2026.04.01"
+composeBom = "2026.05.01"
 
 [libraries]
 appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
