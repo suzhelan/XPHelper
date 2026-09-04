@@ -50,7 +50,7 @@ public class FieldUtils extends BaseFinder<Field> {
     public static void setField(Object target, String fieldName, Object value) {
         FieldUtils.create(target)
                 .fieldName(fieldName)
-                .fieldType(value.getClass())
+                .fieldType(Ignore.class)
                 .setFirst(target, value);
     }
 
@@ -114,8 +114,10 @@ public class FieldUtils extends BaseFinder<Field> {
         //查找类的所有字段
         Field[] declaredFields = getDeclaringClass().getDeclaredFields();
         result.addAll(Arrays.asList(declaredFields));
-        //过滤类型
-        result.removeIf(field -> fieldType != null && !CheckClassType.checkType(field.getType(), fieldType, matchParentClass));
+        //如果字段类型不为Ignore则过滤类型
+        if (fieldType != Ignore.class) {
+            result.removeIf(field -> fieldType != null && !CheckClassType.checkType(field.getType(), fieldType, matchParentClass));
+        }
         //过滤名称
         result.removeIf(field -> fieldName != null && !field.getName().equals(fieldName));
         //写入缓存
